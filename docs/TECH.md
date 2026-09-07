@@ -143,12 +143,31 @@ server { listen 443 ssl; server_name ntfy.qzldeblog.xyz;
 ## 7. 目录结构
 
 ```
-magi/
+magi/（本仓库根）
 ├── AGENTS.md        # Agent 常驻规范
 ├── docs/            # PRD.md · TECH.md · ROADMAP.md
-├── app/             # Flutter：lib/core(主题/DB/同步/通知) + lib/features(briefing/courses/events/tasks/capture/plan/settings) + test/
-├── api/             # FastAPI：routers/ models/ engine/ vision/ tests/
-├── deploy/          # magi.service · ntfy.service · magi-nginx.conf · .env.example
-├── tools/           # seed.dart · smoke.sh 等验收脚本
+├── app/             # Flutter：lib/core(主题/DB/同步/通知) + lib/features(briefing/courses/events/tasks/capture/plan/settings) + test/（S0 已建）
+├── api/             # FastAPI：routers/ models/ engine/ vision/ tests/（S0 已有 app/main.py 空壳 + /healthz）
+├── deploy/          # magi.service · ntfy.service · magi-nginx.conf · .env.example（S4+ 引入）
+├── tools/           # seed.dart · smoke.sh 等验收脚本（S3+ 引入）
 └── magi-docs/       # 本项目文档（HTML 交互版）
 ```
+
+## 8. UI tokens（S0 建立，客户端设计令牌）
+
+代码出处：`app/lib/core/theme/app_tokens.dart`；主题组装在 `app/lib/core/theme/app_theme.dart`。
+组件内禁止写死色值 / 字号 / 间距 —— 一律引用 tokens（AGENTS.md 硬性约定）。
+
+| 令牌组 | 内容 |
+|---|---|
+| 基底色 | bg `#FFFFFF` 纯白 / bgSoft `#F6F7F9` / bgMuted `#EEF0F4` / rule `#E4E7EC`（1px 细分隔线） |
+| 文字 | ink `#17191E` / muted `#6A7180` |
+| 强调 | accent `#1A56DB`（唯一强调蓝）/ accentSoft `#EAF0FC` |
+| NERV 红 | nervRed `#D6323C` / nervRedSoft `#FDEFF0`（仅 DDL 临近 ≤3 天 / 课程冲突 / 服务器失联三语义） |
+| 四象限 | q1 重要紧急：实底蓝；q2 重要不紧急：蓝浅底描边；q3 紧急不重要：墨色描边；q4 不紧急不重要：灰浅底（重要→蓝系、不重要→墨/灰系；紧急→实底高对比、不紧急→浅底描边；不引入新色相） |
+| 圆角 | xs 4 / s 6 / m 8 / l 10（上限 10px） |
+| 间距 | xs 4 / s 8 / m 12 / l 16 / xl 24 / xxl 32 |
+| 字体 | JetBrainsMono（`app/assets/fonts/` 内置 Regular/Bold，与 magi-docs 同源），中文回退 Microsoft YaHei / PingFang SC / Noto Sans CJK SC |
+| 无阴影 | 全主题 elevation 0、surfaceTint 透明 |
+
+深色模式随系统为 PRD 非功能需求；S0 仅交付浅色主题，深色 tokens 随后续里程碑补入。

@@ -6,15 +6,17 @@
 
 ## 当前状态
 
-- 进行中：S0（未开始）
+- 进行中：S1（S0 已完成，tag `s0-scaffold`）
+- 待人工验证（S0）：`flutter build apk --debug` 需在有外网 / 完整 gradle 缓存的机器执行；APK 装入 Redmi K70 Ultra 启动至首页骨架；MX Linux 上 clone 后 `flutter run -d linux` 启动至首页骨架（本机为 Windows 沙箱，无 Linux 工具链且无法访问 services.gradle.org / maven.google.com）
 - 待人工确认：PRD.md 第 5 节剩余假设（课程批量导入的列映射 / 默认提醒时间值）；识图模型、域名 HTTPS、截图隐私、三端、日期制、桌面右侧便签形态与小组件均已确认
 
 ## 里程碑
 
-### [ ] S0 · 脚手架
+### [x] S0 · 脚手架
 范围：Flutter 三端工程（Windows/Linux/Android）与主题 tokens、五 Tab 骨架（今日/课程表/任务/截图/设置）；FastAPI 空壳 + /healthz；uvicorn 本地起服务。
 验收：`flutter analyze` 0 issue；`uvicorn` 起后 `curl -f http://localhost:8001/healthz` 返回 200；三端均能启动到首页骨架。
-Tag：`s0-scaffold`
+Tag：`s0-scaffold`（2026-09-07 完成）
+备注：本机已验证 flutter analyze 0 issue / flutter test 6 项全绿 / Windows debug 构建并实跑（窗口 MAGI，进程响应）/ FastAPI /healthz 200；Android APK 构建与 MX Linux 启动待人工验证（见「当前状态」）。
 
 ### [ ] S1 · 课程表（本地，日期制）
 范围：drift 建表（semester/course/textbook）、课程与教材 CRUD、周/月视图、日期范围与 weekday 过滤、冲突检测、课程表格导入（CSV/iCalendar 基础解析为日期制课程）。
@@ -73,3 +75,4 @@ Tag：`s8-mvp`
 | 2026-09-07 | v1.1：三端全功能、课程日期制、四象限、截图识别、AI 双模型、删 To Do；里程碑改为 S0-S8 | 用户两轮需求确认 |
 | 2026-09-07 | v1.2：识图=Qwen-VL、部署复用博客 Nginx（弃 Caddy/Docker）、课程批量导入、AI 瘦代理（不用 DeepSeek Harness）、确认域名与截图隐私 | 用户第三轮确认（含 qzldeblog 部署现状） |
 | 2026-09-07 | v1.3：新增常驻可见层（桌面右侧便签 + Android 小组件），并入 S3；便签固定屏幕右侧、置于桌面层 | 用户提出便签/小组件需求并确认形态 |
+| 2026-09-07 | S0 完成：Flutter 三端工程 + 主题 tokens + 五 Tab 骨架 + FastAPI /healthz；tag `s0-scaffold` | flutter analyze 0 issue / flutter test 6 项全绿 / Windows 实跑 / uvicorn curl 200；Android 构建与 MX Linux 启动待人工验证 |

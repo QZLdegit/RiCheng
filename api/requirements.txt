@@ -1,0 +1,4 @@
+# MAGI 服务端依赖（S0：FastAPI 空壳）。
+# 里程碑 S4 起将补充 sqlmodel、apscheduler、httpx 等。
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
