@@ -1,0 +1,33 @@
+# ---- 系统生成的分享缓存 ----
+.trae-html-share-packages/
+
+# ---- 参考用博客项目 qzldeblog（独立仓库，不纳入 MAGI 版本控制）----
+blog/
+blog.zip
+
+# ---- 密钥与本地环境（严禁入库）----
+.env
+.env.*
+
+# ---- Python（服务端）----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ---- Flutter / Dart（客户端）----
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+
+# ---- 本地数据库 / 运行时数据 ----
+*.db
+*.sqlite
+
+# ---- 系统杂项 ----
+Thumbs.db
+.DS_Store
+desktop.ini
