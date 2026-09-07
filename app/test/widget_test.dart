@@ -35,7 +35,7 @@ void main() {
       await tester.pumpWidget(const MagiApp());
       await tester.tap(navLabel('课程表'));
       await tester.pumpAndSettle();
-      expect(find.text('课程表（日期制）'), findsOneWidget);
+      expect(find.text('课程表（周次制）'), findsOneWidget);
     });
 
     testWidgets('切到任务页显示 M4 占位', (WidgetTester tester) async {
