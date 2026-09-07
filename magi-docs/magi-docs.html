@@ -276,6 +276,7 @@
     <span>日期 <b>2026-09-07</b></span>
     <span>用户 <b>1 人（大一学生本人）</b></span>
     <span>形态 <b>Flutter 三端 + 自建后端</b></span>
+    <span>进度 <b>S0 ✅（2026-09-07 · tag s0-scaffold）→ S1 进行中</b></span>
     <span>开发方式 <b>Agent 主导开发</b></span>
   </div>
   <p class="mast-line">MAGI 取自《新世纪福音战士》中由三人格组成的超级计算机：本系统由三个模块各司其职——课程（固定坐标）、任务（待执行目标）、时间块（调度结果），并由双 AI 引擎统一调度：Qwen-VL 负责「识图」（截图 → 任务），DeepSeek 负责「规划」（四象限判定 + 时间排程）。本文档把你最初的几句需求扩展为可交付开发的完整需求，并给出技术方案与 Agent 开发路线。</p>
@@ -1252,6 +1253,24 @@ server { listen 443 ssl; server_name ntfy.qzldeblog.xyz;
   location / { proxy_pass http://127.0.0.1:8081; proxy_http_version 1.1; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection "upgrade"; } }</pre>
 
   <p>证书扩签 <code>certbot --nginx -d api.qzldeblog.xyz -d ntfy.qzldeblog.xyz</code> 后由 certbot.timer 自动续期。App 固定 <code>https://api.qzldeblog.xyz</code>，ntfy 订阅地址 <code>https://ntfy.qzldeblog.xyz/&lt;topic&gt;</code>。备份：宿主机 cron 每日复制 SQLite 保留 30 份 + 客户端 JSON 导出双保险。</p>
+
+  <h3><span class="no">5.7</span>UI 设计令牌（S0 落地，B 风格）</h3>
+  <p>代码出处：<code>app/lib/core/theme/app_tokens.dart</code>（令牌定义）+ <code>app/lib/core/theme/app_theme.dart</code>（主题组装），与 <code>docs/TECH.md</code> §8 同步维护。组件内禁止写死色值 / 字号 / 间距，一律引用 tokens。</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th style="width:22%">令牌组</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>基底色</td><td>bg <code>#FFFFFF</code> 纯白 / bgSoft <code>#F6F7F9</code> / bgMuted <code>#EEF0F4</code> / rule <code>#E4E7EC</code>（1px 细分隔线）</td></tr>
+        <tr><td>文字</td><td>ink <code>#17191E</code> / muted <code>#6A7180</code></td></tr>
+        <tr><td>强调</td><td>accent <code>#1A56DB</code>（唯一强调蓝）/ accentSoft <code>#EAF0FC</code></td></tr>
+        <tr><td>NERV 红</td><td>nervRed <code>#D6323C</code> / nervRedSoft <code>#FDEFF0</code> —— 仅 DDL 临近（≤3 天）/ 课程冲突 / 服务器失联三语义</td></tr>
+        <tr><td>四象限</td><td>q1 重要紧急：实底蓝；q2 重要不紧急：蓝浅底描边；q3 紧急不重要：墨色描边；q4 不紧急不重要：灰浅底（重要→蓝系、不重要→墨 / 灰系；紧急→实底高对比、不紧急→浅底描边；不引入新色相）</td></tr>
+        <tr><td>圆角 / 间距</td><td>圆角 xs 4 / s 6 / m 8 / l 10（上限 10px）；间距 xs 4 / s 8 / m 12 / l 16 / xl 24 / xxl 32</td></tr>
+        <tr><td>字体</td><td>JetBrains Mono（<code>app/assets/fonts/</code> 内置 Regular/Bold，与本文档同源）+ 中文回退微软雅黑 / 苹方 / 思源黑体</td></tr>
+        <tr><td>阴影</td><td>全主题 elevation 0、surfaceTint 透明（无阴影）；S0 交付浅色主题，深色模式随系统于后续里程碑补入</td></tr>
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <!-- ================= 06 Agent 开发路线 ================= -->
@@ -1265,7 +1284,7 @@ server { listen 443 ssl; server_name ntfy.qzldeblog.xyz;
     <table>
       <thead><tr><th style="width:9%">ID</th><th style="width:19%">名称</th><th style="width:37%">范围</th><th>验收（可直接执行）</th></tr></thead>
       <tbody>
-        <tr><td>S0</td><td>脚手架</td><td>Flutter 三端工程（Windows/Linux/Android）与主题 tokens、五 Tab 骨架；FastAPI 空壳 + /healthz；uvicorn 本地起服务</td><td><code>flutter analyze</code> 0 issue；<code>curl -f http://localhost:8001/healthz</code> 返回 200；三端均能启动到首页骨架</td></tr>
+        <tr><td>S0</td><td>脚手架 ✅<br><span style="font-weight:400">2026-09-07 完成</span></td><td>Flutter 三端工程（Windows/Linux/Android）与主题 tokens、五 Tab 骨架；FastAPI 空壳 + /healthz；uvicorn 本地起服务</td><td><code>flutter analyze</code> 0 issue；<code>curl -f http://localhost:8001/healthz</code> 返回 200；三端均能启动到首页骨架</td></tr>
         <tr><td>S1</td><td>课程表（本地，日期制）</td><td>drift 建表（semester/course/textbook）、课程与教材 CRUD、周/月视图、日期范围与 weekday 过滤、冲突检测、课程表格导入</td><td><code>dart test</code>：日期范围过滤、weekday 匹配、冲突检测、导入解析四组单测全绿（分支覆盖 ≥ 90%）</td></tr>
         <tr><td>S2</td><td>任务与日程（本地）</td><td>任务 CRUD 与状态流转、四象限字段与手动改象限、DDL 72h 红色警示、排序；事件 CRUD 与日视图</td><td><code>dart test</code>：状态流转、象限排序、DDL 阈值单测全绿</td></tr>
         <tr><td>S3</td><td>今日简报 + 常驻可见层（本地）</td><td>简报页聚合：课程/事件时间轴、带书清单勾选与自定义物品、今日任务四象限分组、MAGI 建议位预留、无课空态；桌面右侧便签（桌面层）+ Android 小组件</td><td><code>dart run tools/seed.dart</code> 后人工核对四区块渲染正确；桌面便签/小组件显示与简报一致、可点击唤起主窗/跳转；学期未设置可降级</td></tr>
@@ -1280,16 +1299,22 @@ server { listen 443 ssl; server_name ntfy.qzldeblog.xyz;
 
   <p>顺序即依赖：S1-S3 是纯本地闭环（不碰服务器），让你<strong>第三周左右就能日常使用简报功能</strong>（数据手动录入）；S4 起引入服务器。每个里程碑完成的定义是表中验收命令通过 + 提交进 main + 在 ROADMAP.md 勾选。MVP = S0-S8 全部完成；此后进入按需迭代（自然语言建任务、周报统计等 P2 项按需立项）。</p>
 
+  <div class="callout"><span class="cap">开发进度 · 2026-09-07</span>
+  ✅ <strong>S0 脚手架已完成</strong>（tag <code>s0-scaffold</code>，commit 已推 main）：<code>flutter analyze</code> 0 issue、<code>flutter test</code> 6 项全绿、FastAPI <code>/healthz</code> 200、Windows debug 构建并实跑（窗口 MAGI）。仓库新增 <code>app/</code>（Flutter 三端工程 + tokens + 五 Tab 骨架）与 <code>api/</code>（FastAPI 空壳）。<br>
+  ⏳ <strong>S1 课程表（本地，日期制）进行中</strong>：drift 建表（semester/course/textbook）、课程与教材 CRUD、周/月视图、日期范围与 weekday 过滤、冲突检测、表格批量导入（CSV/iCalendar）。<br>
+  <span style="color:var(--muted)">待人工验证（S0）：Android APK 构建需在有外网 / 完整 gradle 缓存的机器执行（本机无法访问 services.gradle.org / maven.google.com）；MX Linux 上 <code>flutter run -d linux</code> 启动至首页骨架。</span>
+  </div>
+
   <h3><span class="no">6.2</span>工程约定</h3>
   <pre class="code">magi/
 ├── AGENTS.md            # Agent 常驻规范（命名/测试/提交/边界）
 ├── docs/                # PRD.md · TECH.md · ROADMAP.md（与本 HTML 文档同步演进）
-├── app/                 # Flutter 工程
+├── app/                 # Flutter 工程（S0 已建）
 │   ├── lib/
-│   │   ├── core/        # 主题 tokens、数据库、同步引擎、通知服务
+│   │   ├── core/        # 主题 tokens（S0）、数据库、同步引擎、通知服务
 │   │   └── features/    # briefing/ courses/ events/ tasks/ capture/ plan/ settings/ 按模块分目录
 │   └── test/
-├── api/                 # FastAPI 工程（routers/ models/ engine/ vision/ tests/）
+├── api/                 # FastAPI 工程（S0 已建空壳 app/main.py + /healthz；routers/ 等随里程碑加入）
 ├── deploy/              # magi.service · ntfy.service · magi-nginx.conf · .env.example
 └── tools/               # seed.dart · smoke.sh 等验收脚本</pre>
 
