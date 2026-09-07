@@ -1,0 +1,33 @@
+{
+  "semester": {
+    "name": "2026-2027学年第一学期",
+    "start_date": "2026-09-01",
+    "end_date": "2027-01-10",
+    "total_weeks": 16
+  },
+  "time_slots": [
+    { "period_start": 1, "period_end": 2, "start_time": "08:25", "end_time": "10:00" },
+    { "period_start": 3, "period_end": 4, "start_time": "10:20", "end_time": "11:55" },
+    { "period_start": 5, "period_end": 6, "start_time": "14:30", "end_time": "16:05" },
+    { "period_start": 7, "period_end": 8, "start_time": "16:25", "end_time": "18:00" },
+    { "period_start": 9, "period_end": 10, "start_time": "18:50", "end_time": "20:25" },
+    { "period_start": 11, "period_end": 12, "start_time": "20:30", "end_time": "22:05" }
+  ],
+  "courses": [
+    { "name": "高等数学(理工类)(A)I", "weekday": 1, "start_time": "14:30", "end_time": "16:05", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志412", "teacher": "", "textbooks": [] },
+    { "name": "高等数学(理工类)(A)I", "weekday": 2, "start_time": "16:25", "end_time": "18:00", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志412", "teacher": "", "textbooks": [] },
+    { "name": "高等数学(理工类)(A)I", "weekday": 4, "start_time": "14:30", "end_time": "16:05", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志411", "teacher": "", "textbooks": [] },
+    { "name": "大学物理", "weekday": 2, "start_time": "08:25", "end_time": "10:00", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志307", "teacher": "", "textbooks": [] },
+    { "name": "工程图学(I)", "weekday": 3, "start_time": "08:25", "end_time": "10:00", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志220", "teacher": "", "textbooks": [] },
+    { "name": "工程图学(I)", "weekday": 5, "start_time": "10:20", "end_time": "11:55", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志220", "teacher": "", "textbooks": [] },
+    { "name": "思想道德与法治", "weekday": 2, "start_time": "10:20", "end_time": "11:55", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志412", "teacher": "", "textbooks": [] },
+    { "name": "思想道德与法治", "weekday": 4, "start_time": "08:25", "end_time": "10:00", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志412", "teacher": "", "textbooks": [] },
+    { "name": "体育I", "weekday": 4, "start_time": "10:20", "end_time": "11:55", "start_week": 1, "end_week": 16, "week_type": "all", "room": "北校区足球场1号场地", "teacher": "", "textbooks": [] },
+    { "name": "大学生心理健康教育", "weekday": 2, "start_time": "14:30", "end_time": "16:05", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志513", "teacher": "", "textbooks": [] },
+    { "name": "中华民族共同体概论", "weekday": 1, "start_time": "16:25", "end_time": "18:00", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志222", "teacher": "", "textbooks": [] },
+    { "name": "能源与动力工程导论", "weekday": 4, "start_time": "16:25", "end_time": "18:00", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志321", "teacher": "", "textbooks": [] },
+    { "name": "航空航天概论", "weekday": 1, "start_time": "18:50", "end_time": "20:25", "start_week": 1, "end_week": 16, "week_type": "all", "room": "明志312", "teacher": "", "textbooks": [] },
+    { "name": "大学日语", "weekday": 5, "start_time": "16:25", "end_time": "18:00", "start_week": 1, "end_week": 16, "week_type": "all", "room": "探天楼C407", "teacher": "", "textbooks": [] },
+    { "name": "大学日语听说", "weekday": 6, "start_time": "10:20", "end_time": "11:55", "start_week": 1, "end_week": 16, "week_type": "all", "room": "探天楼C407", "teacher": "", "textbooks": [] }
+  ]
+}

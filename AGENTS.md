@@ -22,7 +22,7 @@ MAGI：单用户个人日程管理系统。Flutter 三端全功能（Windows / M
 1. **里程碑制**：只开发 ROADMAP.md 中当前未完成的最早里程碑（S 编号）；不跳步、不提前做后续里程碑的功能。
 2. **验收命令必须真实通过**：每个里程碑的验收命令（flutter analyze / dart test / pytest / curl 脚本）必须实际执行并通过后才可勾选。
 3. **提交规范**：`feat(S1): 课程冲突检测`、`fix(S4): 同步队列重复出队`。里程碑前缀（S 编号）强制；每个语义单元一次提交。
-4. **测试先行**：纯函数（日期范围过滤、冲突检测、象限排序、DDL 阈值、贪心算法、简报聚合）必须先写单测再实现；分支覆盖 ≥ 90%。
+4. **测试先行**：纯函数（周次过滤、单双周匹配、冲突检测、象限排序、DDL 阈值、贪心算法、简报聚合）必须先写单测再实现；分支覆盖 ≥ 90%。
 5. **依赖纪律**：新增第三方包必须在提交说明中给出理由；标准库 / 现有依赖能解决的不引入。PRD 与 TECH.md 中列出的包是基线。
 6. **UI 纪律**：
    - 颜色、字号、间距一律引用主题 tokens，组件内禁止写死色值。
@@ -38,7 +38,7 @@ MAGI：单用户个人日程管理系统。Flutter 三端全功能（Windows / M
 - 客户端：Flutter 3.x + Riverpod + drift + dio + go_router + flutter_local_notifications + window_manager（桌面右侧便签）+ home_widget（Android 小组件）（三端：Windows / Linux / Android）
 - 服务端：FastAPI + SQLModel + SQLite + APScheduler；复用博客 Nginx 反代 + certbot，`uvicorn`/`ntfy` 两个 systemd 服务部署
 - AI 双模型（瘦代理）：Qwen-VL 只做截图识图（`/vision/extract`）；DeepSeek 只做任务规划（`/ai/plan`）；规划失败降级贪心算法；AI 只产建议不落库
-- 课程为**日期制**（星期几 + 起止时间 + 起止日期），无周次、无奇偶周
+- 课程为**周次制**（星期几 + 起止时间 + 起止周次 + 单双周），学期起止日期在程序中设置
 
 ## 会话工作流
 

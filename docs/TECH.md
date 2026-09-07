@@ -1,9 +1,10 @@
-# TECH — MAGI 技术方案（v1.3）
+# TECH — MAGI 技术方案（v1.4）
 
 与 `docs/PRD.md` 配套的技术事实。架构图、ER 图、Prompt 模板全文见 `magi-docs/magi-docs.html` 第 05 章。
 
 > v1.2 变更：识图模型定为 Qwen-VL；部署由 Docker/Caddy 改为复用博客 Nginx + certbot + systemd；课程支持表格批量导入；明确 AI 走瘦代理（不用编排平台）。
 > v1.3 变更：新增常驻可见层（桌面右侧便签 + Android 小组件），技术选型补齐 window_manager 与 home_widget；两者复用简报聚合数据，不新增业务实体。
+> v1.4 变更：课程模型改回周次制（start_week/end_week/week_type），semester 新增 total_weeks；「今日课程」改为先算当前周次再过滤；种子数据已录入。
 
 ## 1. 架构
 
@@ -43,9 +44,9 @@ Windows / MX Linux / Android（三端，Flutter 一套代码，drift 本地库�
 ## 3. 数据模型（八实体 + 同步元数据）
 
 ```
-semester(id, name, start_date, end_date)                          # 仅用于视图默认范围与归档
+semester(id, name, start_date, end_date, total_weeks)             # 起止日期用于计算当前周次
 course(id, name, weekday 1-7, start_time, end_time,
-       start_date, end_date, room, teacher, group_key NULL, semester_id)  # 日期制，无周次
+       start_week, end_week, week_type all|odd|even, room, teacher, group_key NULL, semester_id)  # 周次制
 textbook(id, course_id→course, name)
 event(id, title, start_at, end_at, all_day, location, note, remind_minutes, repeat_rule JSON)
 task(id, title, course_id→course NULL, due_at NULL, quadrant q1|q2|q3|q4,
@@ -55,7 +56,7 @@ sync_meta(entity, local_id, remote_id, dirty)
 ```
 
 - 所有业务实体统一携带 `updated_at` + `deleted`（软删）供同步。
-- 课程不展开存储：一条记录 = 星期几 + 起止时间 + 起止日期，代表该日期范围内每周该天的课次；「今天的课」按 `today ∈ [start_date,end_date] ∧ weekday 匹配` 实时计算。
+- 课程不展开存储：一条记录 = 星期几 + 起止时间 + 起止周次 + 单双周；「本周课程」= 当前周次 ∈ `[start_week,end_week]` ∧ 单双周匹配；「本日课程」在「本周课程」基础上加 weekday 匹配；当前周次 = `(today - semester.start_date) / 7 + 1`（向下取整）。
 - quadrant 四象限：q1 重要紧急 / q2 重要不紧急 / q3 紧急不重要 / q4 不紧急不重要；AI 首判，用户可覆盖。
 - 常驻可见层（M9：桌面便签 / 小组件）不新增实体：直接复用简报聚合结果，数据从本地 drift 读，桌面便签走内存 Stream、小组件序列化进 SharedPreferences。
 

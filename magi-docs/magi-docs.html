@@ -272,7 +272,7 @@
     <span class="en">MAGI — Personal Schedule Operations System</span>
   </h1>
   <div class="mast-meta">
-    <span>版本 <b>v1.3</b></span>
+    <span>版本 <b>v1.4</b></span>
     <span>日期 <b>2026-09-07</b></span>
     <span>用户 <b>1 人（大一学生本人）</b></span>
     <span>形态 <b>Flutter 三端 + 自建后端</b></span>
@@ -318,7 +318,7 @@
   <h3><span class="no">1.1</span>我补充的需求</h3>
   <p>以下需求未被你明确提出，但它们要么是原始需求的前置条件，要么是你已有资源（服务器、公网 IP）的自然延伸，属于完善需求的必要补充：</p>
   <ul class="plain">
-    <li><strong>学期与日期范围课程体系</strong>：课程按“星期几 + 起止时间 + 起止日期”生效（日期制，无周次/奇偶周）；学期名与整体起止仅用于视图范围与归档。</li>
+    <li><strong>学期与周次制课程体系</strong>：课程按“星期几 + 起止时间 + 起止日期”生效（周次制）；学期起止日期在程序中设置，由它计算当前周次，用于本周课程与本日课程过滤。</li>
     <li><strong>带书清单增强</strong>：教材之外可添加自定义物品（实验报告本、计算器、充电器），出门前统一勾选。</li>
     <li><strong>晨报推送</strong>：不是打开 App 才知道，而是每天 07:00 主动推送到手机——由服务器定时任务完成，这也是自建服务器的核心价值之一。</li>
     <li><strong>离线优先 + 云端同步</strong>：教室里没信号也能看课表、勾任务；联网后自动同步到你的服务器，换手机不丢数据。</li>
@@ -349,7 +349,7 @@
 
   <div class="callout">
     <span class="cap">ASSUMPTIONS / 已确认的假设</span>
-    ① 三端（Windows / MX Linux / Android）皆你本人使用、功能一致；② 课程为“日期范围 + 星期几”的日期制，无周次/奇偶周；③ 已绑定域名 <code>qzldeblog.xyz</code>（复用博客 Nginx + certbot 做 HTTPS，新增 <code>api.</code>/<code>ntfy.</code> 子域名）；④ 晨报 07:00、课前 20 分钟、催办 60 分钟为默认值；⑤ 截图识别以聊天/通知截图为主要输入，识别模型 = Qwen-VL，由服务端代理、密钥不下发。以上均已确认。
+    ① 三端（Windows / MX Linux / Android）皆你本人使用、功能一致；② 课程为"周次制"（星期几 + 起止时间 + 起止周次 + 单双周），学期起止日期在程序中设置、由它计算当前周次；③ 已绑定域名 <code>qzldeblog.xyz</code>（复用博客 Nginx + certbot 做 HTTPS，新增 <code>api.</code>/<code>ntfy.</code> 子域名）；④ 晨报 07:00、课前 20 分钟、催办 60 分钟为默认值；⑤ 截图识别以聊天/通知截图为主要输入，识别模型 = Qwen-VL，由服务端代理、密钥不下发。以上均已确认。
   </div>
 </section>
 
@@ -463,7 +463,7 @@
       <p>首页单列纵向滚动，自上而下依次为：状态栏 → 日期头（当前学期 + 星期几）→ 课程时间轴 → 带书清单 → 今日任务 → MAGI 建议。底部固定 Tab 栏共 5 个入口：今日、课程表、任务、截图、设置。无下拉刷新手势（数据本地即时可用），右上角保留手动同步状态小图标。</p>
 
       <h4>业务逻辑</h4>
-      <p>进入页面时，系统以当天日期为输入，从课程表中筛选「<mark class="key">weekday = 今天星期几 且 今天 ∈ 课程 [start_date, end_date]</mark>」的课程（日期制，无需周次/奇偶周计算），按开始时间排序渲染时间轴。带书清单由筛选结果中每门课的教材列表自动展开合并，去重后逐条展示，用户勾选状态写入本地存储、当天有效（次日 00:00 自动重置为未装包）；用户可在清单内追加自定义物品，手动添加的物品只属于当天。今日任务按四象限分组，「截止时间在今天或已过期且未完成」的任务红色置顶，其余未完成按象限 + 截止时间排序，每组显示前 3 条，超出的折叠为「还有 N 项」。MAGI 建议卡片的数据来自最近一次智能安排引擎的输出摘要：若当天存在已生成未处理的时间块建议，则展示离当前时间最近的一条，点击「接受安排」即确认该时间块并写入日程，「忽略」仅收起本条卡片不影响其余建议。所有勾选与状态变更即时写入本地数据库并进入同步队列。</p>
+      <p>进入页面时，系统以当天日期为输入，从课程表中筛选「<mark class="key">weekday = 今天星期几 且 当前周次 ∈ 课程 [start_week, end_week] 且 单双周匹配</mark>」的课程（周次制，由学期起止日期算当前周次），按开始时间排序渲染时间轴。带书清单由筛选结果中每门课的教材列表自动展开合并，去重后逐条展示，用户勾选状态写入本地存储、当天有效（次日 00:00 自动重置为未装包）；用户可在清单内追加自定义物品，手动添加的物品只属于当天。今日任务按四象限分组，「截止时间在今天或已过期且未完成」的任务红色置顶，其余未完成按象限 + 截止时间排序，每组显示前 3 条，超出的折叠为「还有 N 项」。MAGI 建议卡片的数据来自最近一次智能安排引擎的输出摘要：若当天存在已生成未处理的时间块建议，则展示离当前时间最近的一条，点击「接受安排」即确认该时间块并写入日程，「忽略」仅收起本条卡片不影响其余建议。所有勾选与状态变更即时写入本地数据库并进入同步队列。</p>
 
       <h4>字段规则 · 带书清单</h4>
       <div class="table-wrap">
@@ -560,8 +560,8 @@
       <p>页面上方为学期信息行与视图切换器（周/月），主体是周视图网格：列为周一至周日，行为时间段（08:00 / 10:10 / 14:00 / 16:20 / 19:00）；月视图为日期格子标注当日课节数。课程格内为课名 + 教室 + 日期范围；当前时间所在列高亮。新增课程为底部抽屉表单。</p>
 
       <h4>业务逻辑</h4>
-      <p>课程是带日期范围的周期性日程：<mark class="key">一条课程记录 = 星期几 + 起止时间 + 起止日期 [start_date, end_date]</mark>，而不是逐次展开。渲染时对每条课程判断：目标日 ∈ [start_date, end_date] 且 weekday 匹配，二者满足才显示。新增课程前执行冲突检测：与同一星期、日期范围有交集、时间区间重叠的已有课程视为冲突，报错并列出冲突课程名，拒绝保存。编辑复用同一表单与同一校验；删除需二次确认（防误删一学期的课）。课程被任务引用时不级联删除任务，仅解除课程关联标记。教材与课程为一对多关系，在课
-程表内维护，供 M1 带书清单汇总。学期设置（名称 + 整体起止日期）仅用于视图默认范围与归档，不参与单课匹配。</p>
+      <p>课程是带周次的周期性日程：<mark class="key">一条课程记录 = 星期几 + 起止时间 + 起止周次 [start_week, end_week] + 单双周（all/odd/even）</mark>，而不是逐次展开。渲染时先由学期起止日期算出当前周次，再判断：当前周次 ∈ [start_week, end_week] 且单双周匹配且 weekday 匹配，三者满足才显示。新增课程前执行冲突检测：与同一星期、周次范围有交集、单双周不互斥、时间区间重叠的已有课程视为冲突，报错并列出冲突课程名，拒绝保存。编辑复用同一表单与同一校验；删除需二次确认（防误删一学期的课）。课程被任务引用时不级联删除任务，仅解除课程关联标记。教材与课程为一对多关系，在课
+程表内维护，供 M1 带书清单汇总。学期设置（名称 + 起止日期 + 总周数）用于计算当前周次与学年归档。</p>
 
       <h4>字段规则 · 课程</h4>
       <div class="table-wrap">
@@ -571,7 +571,8 @@
             <tr><td>课名</td><td>文本</td><td>是</td><td>1-20 字</td></tr>
             <tr><td>星期</td><td>枚举</td><td>是</td><td>周一至周日</td></tr>
             <tr><td>起止时间</td><td>时间对</td><td>是</td><td>HH:MM；start_time &lt; end_time</td></tr>
-            <tr><td>起止日期</td><td>日期对</td><td>是</td><td>start_date ≤ end_date；默认覆盖整个学期</td></tr>
+            <tr><td>起止周次</td><td>整数对</td><td>是</td><td>1 ≤ start_week ≤ end_week ≤ total_weeks</td></tr>
+            <tr><td>单双周</td><td>枚举</td><td>是</td><td>all（全周）/ odd（单周）/ even（双周）</td></tr>
             <tr><td>教室 / 教师</td><td>文本</td><td>否</td><td>各 ≤ 20 字</td></tr>
             <tr><td>教材列表</td><td>文本数组</td><td>否</td><td>0-6 本；每本 ≤ 40 字</td></tr>
           </tbody>
@@ -1115,6 +1116,7 @@ erDiagram
     string name
     date start_date
     date end_date
+    int total_weeks
   }
   COURSE {
     int id PK
@@ -1122,8 +1124,9 @@ erDiagram
     int weekday
     time start_time
     time end_time
-    date start_date
-    date end_date
+    int start_week
+    int end_week
+    string week_type
     string room
     string teacher
   }
@@ -1160,10 +1163,10 @@ erDiagram
     string reason
   }
     </pre>
-    <figcaption>图 5-2 · 实体关系：课程是按「日期范围 + 星期几」的日期制规则（无周次）；事件表独立承接一次性日程</figcaption>
+    <figcaption>图 5-2 · 实体关系：课程按「周次 + 星期几 + 单双周」的周次制规则；学期起止日期用于计算当前周次；事件表独立承接一次性日程</figcaption>
   </figure>
 
-  <p>要点说明：<mark class="key">课程不展开存储</mark>——一条记录 = 星期几 + 起止时间 + 起止日期，代表该日期范围内每周该天的课次，「今天的课」按 <code>today ∈ [start_date, end_date] ∧ weekday 匹配</code> 实时计算、不落库。EVENT 表的 repeat_rule 为 JSON（freq / interval / until），MVP 支持每天、每周、每两周三档。task 的 quadrant 为四象限（q1 重要紧急 / q2 重要不紧急 / q3 紧急不重要 / q4 不紧急不重要）。所有实体带 updated_at 与 deleted（软删）两列，供同步引擎做增量与冲突判定。</p>
+  <p>要点说明：<mark class="key">课程不展开存储</mark>——一条记录 = 星期几 + 起止时间 + 起止周次 + 单双周；「本周课程」按 <code>当前周次 ∈ [start_week, end_week] ∧ 单双周匹配</code> 计算，「本日课程」在此基础上加 <code>weekday 匹配</code>；当前周次由 <code>(today - semester.start_date) / 7 + 1</code>（向下取整）计算、不落库。EVENT 表的 repeat_rule 为 JSON（freq / interval / until），MVP 支持每天、每周、每两周三档。task 的 quadrant 为四象限（q1 重要紧急 / q2 重要不紧急 / q3 紧急不重要 / q4 不紧急不重要）。所有实体带 updated_at 与 deleted（软删）两列，供同步引擎做增量与冲突判定。</p>
 
   <h3><span class="no">5.4</span>API 设计</h3>
   <div class="table-wrap">
@@ -1285,7 +1288,7 @@ server { listen 443 ssl; server_name ntfy.qzldeblog.xyz;
       <thead><tr><th style="width:9%">ID</th><th style="width:19%">名称</th><th style="width:37%">范围</th><th>验收（可直接执行）</th></tr></thead>
       <tbody>
         <tr><td>S0</td><td>脚手架 ✅<br><span style="font-weight:400">2026-09-07 完成</span></td><td>Flutter 三端工程（Windows/Linux/Android）与主题 tokens、五 Tab 骨架；FastAPI 空壳 + /healthz；uvicorn 本地起服务</td><td><code>flutter analyze</code> 0 issue；<code>curl -f http://localhost:8001/healthz</code> 返回 200；三端均能启动到首页骨架</td></tr>
-        <tr><td>S1</td><td>课程表（本地，日期制）</td><td>drift 建表（semester/course/textbook）、课程与教材 CRUD、周/月视图、日期范围与 weekday 过滤、冲突检测、课程表格导入</td><td><code>dart test</code>：日期范围过滤、weekday 匹配、冲突检测、导入解析四组单测全绿（分支覆盖 ≥ 90%）</td></tr>
+        <tr><td>S1</td><td>课程表（本地，周次制）</td><td>drift 建表（semester/course/textbook，含 start_week/end_week/week_type）、课程与教材 CRUD、周/月视图、周次过滤与 weekday 匹配、单双周匹配、冲突检测、课程表格导入；种子数据 seed/courses.json</td><td><code>dart test</code>：周次过滤、单双周匹配、weekday 匹配、冲突检测、导入解析五组单测全绿（分支覆盖 ≥ 90%）</td></tr>
         <tr><td>S2</td><td>任务与日程（本地）</td><td>任务 CRUD 与状态流转、四象限字段与手动改象限、DDL 72h 红色警示、排序；事件 CRUD 与日视图</td><td><code>dart test</code>：状态流转、象限排序、DDL 阈值单测全绿</td></tr>
         <tr><td>S3</td><td>今日简报 + 常驻可见层（本地）</td><td>简报页聚合：课程/事件时间轴、带书清单勾选与自定义物品、今日任务四象限分组、MAGI 建议位预留、无课空态；桌面右侧便签（桌面层）+ Android 小组件</td><td><code>dart run tools/seed.dart</code> 后人工核对四区块渲染正确；桌面便签/小组件显示与简报一致、可点击唤起主窗/跳转；学期未设置可降级</td></tr>
         <tr><td>S4</td><td>后端与同步</td><td>全部 REST 端点、Token 认证、同步引擎（push/pull、last-write-wins）、设置页服务器配置与登录</td><td><code>pytest</code> 全绿；<code>bash tools/smoke.sh</code>（登录→建课→建任务→拉取）通过</td></tr>
@@ -1301,7 +1304,7 @@ server { listen 443 ssl; server_name ntfy.qzldeblog.xyz;
 
   <div class="callout"><span class="cap">开发进度 · 2026-09-07</span>
   ✅ <strong>S0 脚手架已完成</strong>（tag <code>s0-scaffold</code>，commit 已推 main）：<code>flutter analyze</code> 0 issue、<code>flutter test</code> 6 项全绿、FastAPI <code>/healthz</code> 200、Windows debug 构建并实跑（窗口 MAGI）。仓库新增 <code>app/</code>（Flutter 三端工程 + tokens + 五 Tab 骨架）与 <code>api/</code>（FastAPI 空壳）。<br>
-  ⏳ <strong>S1 课程表（本地，日期制）进行中</strong>：drift 建表（semester/course/textbook）、课程与教材 CRUD、周/月视图、日期范围与 weekday 过滤、冲突检测、表格批量导入（CSV/iCalendar）。<br>
+  ⏳ <strong>S1 课程表（本地，周次制）进行中</strong>：drift 建表（semester/course/textbook，含 start_week/end_week/week_type）、课程与教材 CRUD、周/月视图、周次过滤与 weekday 匹配、冲突检测、表格批量导入（CSV/iCalendar）；种子数据已录入 seed/courses.json。<br>
   <span style="color:var(--muted)">待人工验证（S0）：Android APK 构建需在有外网 / 完整 gradle 缓存的机器执行（本机无法访问 services.gradle.org / maven.google.com）；MX Linux 上 <code>flutter run -d linux</code> 启动至首页骨架。</span>
   </div>
 
@@ -1348,7 +1351,7 @@ server { listen 443 ssl; server_name ntfy.qzldeblog.xyz;
     <table>
       <thead><tr><th style="width:18%">术语</th><th>定义</th></tr></thead>
       <tbody>
-        <tr><td>日期制</td><td>课程按「星期几 + 起止时间 + 起止日期 [start_date, end_date]」定义，无周次/奇偶周；「今天的课」按日期与星期实时计算，不落库。</td></tr>
+        <tr><td>周次制</td><td>课程按「星期几 + 起止时间 + 起止周次 [start_week, end_week] + 单双周」定义；学期起止日期在程序中设置，由它计算当前周次；「本周课程」「本日课程」均基于周次过滤，不落库。</td></tr>
         <tr><td>四象限</td><td>艾森豪威尔矩阵（紧急 × 重要）四档：q1 重要紧急 / q2 重要不紧急 / q3 紧急不重要 / q4 不紧急不重要；AI 首判，用户可覆盖。</td></tr>
         <tr><td>待机</td><td>作息窗口内未被课程、日程、时间块占用的时段，即智能安排的可分配空间。</td></tr>
         <tr><td>时间块</td><td>任务与具体时间的绑定单元，来源为 AI 建议或手动创建，状态含建议中 / 已接受 / 已拒绝 / 已完成。</td></tr>
